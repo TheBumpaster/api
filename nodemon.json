@@ -1,0 +1,11 @@
+{
+  "restartable": "rs",
+  "ignore": [
+    "node_modules", ".git", ".idea", ".vscode", "tests"
+  ],
+  "watch": ["server/**/**"],
+  "ext": "ts",
+  "exec": "node --require ts-node/register server/index",
+  "verbose": true,
+  "delay": 500
+}
