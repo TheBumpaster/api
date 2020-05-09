@@ -1,0 +1,42 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "RESTFull Application with ExpressJS",
+  "main": "server/index",
+  "scripts": {
+    "test": "test",
+    "run": "nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheBumpaster/api.git"
+  },
+  "keywords": [
+    "express",
+    "typescript",
+    "api",
+    "boilerplate",
+    "mongodb"
+  ],
+  "author": "Ismar Hadzic",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/TheBumpaster/api/issues"
+  },
+  "homepage": "https://github.com/TheBumpaster/api#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.13",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "typescript": "^3.8.3",
+    "ts-node": "^8.10.1",
+    "nodemon": "^2.0.3",
+    "@types/dotenv": "^8.2.0",
+    "@types/node": "^13.13.5",
+    "@types/express": "^4.17.6",
+    "@types/winston": "^2.4.4"
+  }
+}
