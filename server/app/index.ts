@@ -1,9 +1,11 @@
-import * as express from "express";
+const express = require("express");
+const cookieParser = require("cookie-parser");
 import {Logger} from "../services/logger";
 import {API} from "../api";
+import {json} from "body-parser";
 
 export class Application {
-    public server: express.Application;
+    public server;
     public API: API;
     private logger: Logger = new Logger(__filename);
 
@@ -11,6 +13,9 @@ export class Application {
 
         // Attach express application
         this.server = express();
+        this.server.use(json());
+        this.server.use(cookieParser());
+
         this.API = new API(this.server);
 
         // Initialize listener

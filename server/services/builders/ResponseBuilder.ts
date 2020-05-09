@@ -2,9 +2,9 @@ import {Response} from "express";
 
 export class ResponseBuilder {
 
-    protected status: number;
-    protected data: object;
-    protected response: Response;
+    protected status: number | undefined;
+    protected data: object | undefined;
+    protected response: Response | undefined;
 
     public build(response: Response) {
         this.response = response;
@@ -25,18 +25,15 @@ export class ResponseBuilder {
     }
 
     public finish() {
-        return this.response.status(this.status)
-            .json({
-                meta: {
-                    status: !!this.status
-                },
-                response: this.data
-            });
-    }
-
-    constructor() {
-        this.status = 999;
-        this.data = null;
+        if (this.response !== undefined) {
+            return this.response.status(this.status as number)
+                .json({
+                    meta: {
+                        status: !!this.status
+                    },
+                    response: this.data
+                });
+        }
     }
 
 

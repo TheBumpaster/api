@@ -1,4 +1,5 @@
-import * as mongoose from "mongoose";
+import {ConnectionOptions} from "mongoose";
+const mongoose = require("mongoose");
 import {Logger} from "../services/logger";
 
 export class Database {
@@ -11,7 +12,7 @@ export class Database {
     public connecting: boolean = false;
     private logger: Logger = new Logger(__filename);
 
-    constructor(mongoUri: string, options: mongoose.ConnectionOptions = { useNewUrlParser: true, useUnifiedTopology: true}) {
+    constructor(mongoUri: string, options: ConnectionOptions = { useNewUrlParser: true, useUnifiedTopology: true}) {
         // Establish connection attempt
         this.connecting = true;
         mongoose.connect(mongoUri, options, (error) => {

@@ -4,7 +4,7 @@ import {Environment} from "./config/environment";
 import {join} from "path";
 
 const environment = new Environment(join(__dirname, "../.env"));
-const database = new Database(Database.generateURI(process.env.MONGO_HOST, process.env.MONGO_PORT, process.env.MONGO_DB));
-const application = new Application(process.env.PORT, process.env.HOST);
+const database = new Database(Database.generateURI(process.env.MONGO_HOST as string, process.env.MONGO_PORT as string, process.env.MONGO_DB as string));
+const application = new Application(process.env.PORT as string, process.env.HOST as string);
 
-export default {application};
+export default {environment, database, application};
