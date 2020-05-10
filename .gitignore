@@ -107,3 +107,5 @@ dist
 .idea
 .vscode
 package-lock.json
+database.json
+error.log

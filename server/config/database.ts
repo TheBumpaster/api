@@ -1,6 +1,7 @@
 import {ConnectionOptions} from "mongoose";
 const mongoose = require("mongoose");
 import {Logger} from "../services/logger";
+import {Migrations} from "./migrations";
 
 export class Database {
     // Static function to generate mongo uri
@@ -8,9 +9,11 @@ export class Database {
         return `mongodb://${host}:${port}/${db}`;
     }
 
+
     public connected: boolean = false;
     public connecting: boolean = false;
     private logger: Logger = new Logger(__filename);
+    private migrator: Migrations = new Migrations();
 
     constructor(mongoUri: string, options: ConnectionOptions = { useNewUrlParser: true, useUnifiedTopology: true}) {
         // Establish connection attempt
@@ -20,8 +23,16 @@ export class Database {
                 this.connecting = false;
             }
             this.connected = true;
+
+            // Run initial migrations
+            this.migrator.initializeDatabaseStructure();
         });
 
+        // Initialize database connection event listeners
+        this.connectionStatusListener(mongoUri);
+    }
+
+    private connectionStatusListener(mongoUri: string) {
         // Listen to connection statuses
         mongoose.connection.on("connected", () => {
             this.logger.info(`Mongoose successfully connected on ${mongoUri}`);
@@ -60,4 +71,5 @@ export class Database {
             this.logger.info('Mongoose all nodes are connected!');
         });
     }
+
 }

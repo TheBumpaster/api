@@ -6,6 +6,10 @@
   "scripts": {
     "test": "test",
     "run": "nodemon",
+    "migrate:up:run": "npm run build && db-migrate -e dev -m ./dist/services/migrations -v --config ./database.json up",
+    "migrate:down:run": "npm run build && db-migrate -e dev -m ./dist/services/migrations -v --config ./database.json down",
+    "migrate:create": "db-migrate -e dev -m ./server/services/migrations -v --config ./migrations.json create test_process",
+    "build&run": "npm run build && npm run start",
     "build": "tsc --build tsconfig.json --pretty",
     "start": "node dist/index.js"
   },
@@ -34,6 +38,8 @@
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.13",
+    "db-migrate": "^0.11.11",
+    "db-migrate-mongodb": "^1.5.0",
     "winston": "^3.2.1"
   },
   "devDependencies": {
