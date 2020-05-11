@@ -1,4 +1,6 @@
 import {ConnectionOptions} from "mongoose";
+import {MongoMemoryServer} from "mongodb-memory-server";
+
 const mongoose = require("mongoose");
 import {Logger} from "../services/logger";
 import {Migrations} from "./migrations";
@@ -13,23 +15,67 @@ export class Database {
     public connected: boolean = false;
     public connecting: boolean = false;
     private logger: Logger = new Logger(__filename);
-    private migrator: Migrations = new Migrations();
+    private migrator: Migrations | undefined;
+    private mongoMemoryServer: MongoMemoryServer | undefined;
 
     constructor(mongoUri: string, options: ConnectionOptions = { useNewUrlParser: true, useUnifiedTopology: true}) {
-        // Establish connection attempt
-        this.connecting = true;
-        mongoose.connect(mongoUri, options, (error) => {
-            if (error) {
-                this.connecting = false;
-            }
-            this.connected = true;
+        if (process.env.ENV !== "test"){
 
-            // Run initial migrations
-            this.migrator.initializeDatabaseStructure();
-        });
+            this.logger.info(`Mongoose connecting on ${mongoUri} with environment ${process.env.ENV}`);
+            // Establish connection attempt
+            this.connecting = true;
+            mongoose.connect(mongoUri, options, (error) => {
+                if (error) {
+                    this.connecting = false;
+                }
+                this.connected = true;
+                this.migrator = new Migrations();
 
-        // Initialize database connection event listeners
-        this.connectionStatusListener(mongoUri);
+                // Run initial migrations
+                this.migrator.initializeDatabaseStructure();
+
+                // Initialize database connection event listeners
+                this.connectionStatusListener(mongoUri);
+            });
+
+        } else {
+            this.mongoMemoryServer = new MongoMemoryServer();
+
+            Promise.all([
+                this.mongoMemoryServer.getUri(),
+                this.mongoMemoryServer.getPort(),
+                this.mongoMemoryServer.getDbName(),
+            ])
+                .then((promises: any[]) => {
+                this.logger.info(`Mongoose dummy database connecting on ${promises[0]} with environment ${process.env.ENV}`);
+
+                process.env.MONGO_PORT = promises[1];
+                process.env.MONGO_DB = promises[2];
+                process.env.MONGO_HOST = "127.0.0.1";
+
+                mongoose.connect(promises[0], options, (error) => {
+                    if (error) {
+                        console.log(error);
+                        this.logger.error(`Mongoose dummy database connecting failed on ${promises[0]} with environment ${process.env.ENV}`);
+
+                        this.connecting = false;
+                    }
+                    this.connected = true;
+                    this.migrator = new Migrations();
+
+                    // Run initial migrations
+                    this.migrator.initializeDatabaseStructure();
+
+                    // Initialize database connection event listeners
+                    this.connectionStatusListener(promises[0]);
+                });
+
+            });
+
+
+
+        }
+
     }
 
     private connectionStatusListener(mongoUri: string) {

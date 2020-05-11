@@ -12,10 +12,17 @@ export class Logger {
             return `[ ${timestamp} ] :: [${level}] | ${label} |: ${message}`
         });
 
+        let lvTransports;
+
+        if(process.env.ENV !== "test") {
+            lvTransports = [consoleTransport, fileErrorTransport];
+        } else {
+            lvTransports = [fileErrorTransport];
+        }
         const loggerOptions = {
             level: "debug",
             format: format.combine(format.label({label: context, message: false}), format.timestamp(), defaultLogFormat),
-            transports: [consoleTransport, fileErrorTransport]
+            transports: lvTransports
         };
 
         this.util = createLogger(loggerOptions);

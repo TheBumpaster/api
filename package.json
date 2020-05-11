@@ -4,12 +4,14 @@
   "description": "RESTFull Application with ExpressJS",
   "main": "server/index",
   "scripts": {
-    "test": "test",
     "run": "nodemon",
+    "test:help": "mocha --help",
+    "test": "mocha --file ./test/util/setup.js --full-trace --colors --diff --exit --timeout 12000 -ui mocha-typescript ./test/**/*.spec.js",
     "migrate:up:run": "npm run build && db-migrate -e dev -m ./dist/services/migrations -v --config ./database.json up",
     "migrate:down:run": "npm run build && db-migrate -e dev -m ./dist/services/migrations -v --config ./database.json down",
     "migrate:create": "db-migrate -e dev -m ./server/services/migrations -v --config ./migrations.json create test_process",
     "build&run": "npm run build && npm run start",
+    "build&test": "npm run build && npm run test",
     "build": "tsc --build tsconfig.json --pretty",
     "start": "node dist/index.js"
   },
@@ -43,9 +45,16 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
     "typescript": "^3.8.3",
     "ts-node": "^8.10.1",
     "nodemon": "^2.0.3",
+    "mocha": "^7.1.2",
+    "mocha-typescript": "^1.1.17",
+    "mongodb-memory-server": "^6.5.2",
+    "@types/mongodb-memory-server": "^2.3.0",
+    "@types/chai": "^4.2.11",
     "@types/body-parser": "^1.19.0",
     "@types/cookie-parser": "^1.4.2",
     "@types/jsonwebtoken": "^8.3.9",
