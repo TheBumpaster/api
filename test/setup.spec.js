@@ -2,8 +2,8 @@ process.env.ENV = "test";
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const dotenv = require("dotenv");
-const Application = require("../../dist/app/index").Application;
-const Database = require("../../dist/config/database").Database;
+const Application = require("../dist/app").Application;
+const Database = require("../dist/config/database").Database;
 
 chai.use(chaiHttp);
 

@@ -3,6 +3,7 @@ import {Request, Response} from "express";
 import {ResponseBuilder} from "../../services/builders/ResponseBuilder";
 import * as jwt from "jsonwebtoken";
 import {UserModel} from "../../models/user";
+import {comparePasswords} from "../../models/user/service";
 
 const logger: Logger = new Logger(__filename);
 
@@ -30,7 +31,7 @@ export class AuthController {
 
         try {
             // Find user
-            const user = await UserModel.findUserByUsername(request.body.username);
+            let user = await UserModel.findUserByUsername(request.body.username);
             if (!user) {
                 logger.warn(`new login request. User doesn't exist.`);
                 return new ResponseBuilder()
@@ -39,7 +40,9 @@ export class AuthController {
                     .setData({message: "User does not exist."})
                     .finish();
             }
-            const passwordCheck = user.validateUserPassword(request.body.password);
+            const userData = await UserModel.findUserById(user.id);
+            const passwordCheck = comparePasswords(request.body.password, userData.password);
+
             if (!passwordCheck) {
                 logger.warn(`new login request. password missmatch`);
 
@@ -50,7 +53,21 @@ export class AuthController {
                     .finish();
             }
 
-            const token = jwt.sign({ user }, process.env.JWT_SECRET as string, {algorithm: "HS256", expiresIn: process.env.JWT_EXPIRY});
+            const userObject = {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
+                __v: user.__v,
+            };
+
+            const token = jwt.sign({ user: userObject }, process.env.JWT_SECRET as string, {
+                algorithm: "HS256",
+                expiresIn: process.env.JWT_EXPIRY,
+                audience: process.env.JWT_AUDIENCE,
+                issuer: `https://${process.env.HOST}`
+            });
 
             return new ResponseBuilder()
                 .build(response)
@@ -94,7 +111,7 @@ export class AuthController {
 
         try {
             // Find user
-            const user = await UserModel.findUserByUsername(request.body.username);
+            let user = await UserModel.findUserByUsername(request.body.username);
             if (user) {
                 logger.warn(`new register request. User already exist.`);
                 return new ResponseBuilder()
@@ -104,13 +121,28 @@ export class AuthController {
                     .finish();
             }
 
-            const newUser = await UserModel.createUser(request.body.username, request.body.email, request.body.password, request.body.profile);
-            const token = jwt.sign({ user }, process.env.JWT_SECRET as string, {algorithm: "HS256", expiresIn: process.env.JWT_EXPIRY});
+            user = await UserModel.createUser(request.body.username, request.body.email, request.body.password, "no-user-roles", request.body.profile);
+
+            const userObject = {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
+                __v: user.__v,
+            };
+
+            const token = jwt.sign({ user: userObject }, process.env.JWT_SECRET as string, {
+                algorithm: "HS256",
+                expiresIn: process.env.JWT_EXPIRY,
+                audience: process.env.JWT_AUDIENCE,
+                issuer: `https://${process.env.HOST}`
+            });
 
             return new ResponseBuilder()
                 .build(response)
                 .setStatus(400)
-                .setData({user: newUser, token})
+                .setData({user: userObject, token})
                 .finish();
         } catch (error) {
 

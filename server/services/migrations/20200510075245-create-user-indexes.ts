@@ -1,5 +1,10 @@
+// @ts-ignore
 let dbm;
+
+// @ts-ignore
 let type;
+
+// @ts-ignore
 let seed;
 
 /**

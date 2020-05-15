@@ -21,7 +21,8 @@ export interface IUserModelDocument extends Document {
         gravatar?: string,
         phone?: string;
     };
-
+    createdAt?: string;
+    updatedAt?: string;
     validateUserPassword(password: string): boolean;
 }
 
@@ -35,7 +36,7 @@ export interface IUserStatics {
     updateUserProfile(profile: object, username: string): Promise<IUserModelDocument>;
 
     deleteUser(id: string): Promise<object>;
-    createUser(username: string, email: string, password: string, profile?: object): Promise<IUserModelDocument>;
+    createUser(username: string, email: string, password: string, role?: string, profile?: object): Promise<IUserModelDocument>;
 }
 
 export const userSchema: Schema = new Schema({
@@ -53,7 +54,6 @@ export const userSchema: Schema = new Schema({
         type: String,
         required: true
     },
-
     profile: Schema.Types.Mixed,
 }, {
     timestamps: true,

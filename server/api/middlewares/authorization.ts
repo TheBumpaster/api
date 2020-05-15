@@ -4,7 +4,7 @@ import {Logger} from "../../services/logger";
 import * as jwt from "jsonwebtoken";
 import {AuthorizedRequest} from "../index";
 
-const logger: Logger = new Logger();
+const logger: Logger = new Logger(__filename);
 
 export function authorize(request: AuthorizedRequest, response: Response, next: NextFunction) {
     logger.info("Authorizing request");
@@ -41,7 +41,7 @@ export function authorize(request: AuthorizedRequest, response: Response, next: 
             .finish();
     }
 
-    request.user = payload;
+    request.payload = payload;
 
     next();
 }

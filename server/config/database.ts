@@ -20,12 +20,13 @@ export class Database {
 
     constructor(mongoUri: string, options: ConnectionOptions = { useNewUrlParser: true, useUnifiedTopology: true}) {
         if (process.env.ENV !== "test"){
-
             this.logger.info(`Mongoose connecting on ${mongoUri} with environment ${process.env.ENV}`);
             // Establish connection attempt
             this.connecting = true;
             mongoose.connect(mongoUri, options, (error) => {
                 if (error) {
+                    this.logger.error(`Mongoose connection error on ${mongoUri} with environment ${process.env.ENV}`);
+                    console.log(error);
                     this.connecting = false;
                 }
                 this.connected = true;
@@ -57,7 +58,7 @@ export class Database {
                     if (error) {
                         console.log(error);
                         this.logger.error(`Mongoose dummy database connecting failed on ${promises[0]} with environment ${process.env.ENV}`);
-
+                        console.log(error);
                         this.connecting = false;
                     }
                     this.connected = true;

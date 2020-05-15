@@ -2,6 +2,7 @@ import {IUserModel, IUserModelDocument} from "./schema";
 import {Logger} from "../../services/logger";
 import * as crypto from "crypto-js";
 const logger: Logger = new Logger(__filename);
+
 /**
  * Mongoose static service
  * @param query
@@ -13,7 +14,7 @@ export async function findUsers(query?: object, limit = 200, skip = 0) {
     // @ts-ignore
     const model: IUserModel = this;
 
-    return model.find(query !== undefined ? query : {})
+    return model.find(query !== undefined ? query : {}, {password: 0})
         .limit(limit)
         .skip(skip)
         .lean()
@@ -28,7 +29,7 @@ export async function findUserByUsername(username: string) {
     logger.info(`findUserByUsername username: ${username}`);
     // @ts-ignore
     const model: IUserModel = this;
-    return model.findOne({username})
+    return model.findOne({username}, {password: 0})
         .lean()
         .exec();
 }
@@ -41,7 +42,7 @@ export async function findUserByEmail(email: string) {
     logger.info(`findUserByEmail email: ${email}`);
     // @ts-ignore
     const model: IUserModel = this;
-    return model.findOne({email})
+    return model.findOne({email}, {password: 0})
         .lean()
         .exec();
 }
@@ -105,14 +106,16 @@ export async function deleteUser(id: string) {
  * @param username
  * @param email
  * @param password
+ * @param role
  * @param profile
  */
-export async function createUser(username: string, email: string, password: string, profile?: object) {
+export async function createUser(username: string, email: string, password: string, role?: string, profile?: object) {
     logger.info(`createUser username: ${username} email: ${email} `);
     // @ts-ignore
     const model: IUserModel = this;
+
     return model.create({
-        username, email, password, profile
+        username, email, password, profile, role
     });
 }
 
@@ -125,6 +128,16 @@ export function validateUserPassword(cPassword: string) {
     const userDocument: IUserModelDocument = this;
 
     return userDocument.password === crypto.SHA3(cPassword, {outputLength: 256}).toString();
+}
+
+
+/**
+ * Static function
+ * @param cPassword
+ * @param oldPassword
+ */
+export function comparePasswords(cPassword: string, oldPassword: string) {
+    return oldPassword === crypto.SHA3(cPassword, {outputLength: 256}).toString();
 }
 
 /**
